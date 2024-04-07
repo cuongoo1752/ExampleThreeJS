@@ -10,18 +10,19 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+const geometry = new THREE.CircleGeometry(1, 40);
+const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+const circle = new THREE.Mesh(geometry, material);
+scene.add(circle);
+scene.add(circle);
 
 camera.position.z = 5;
 
 function animate() {
   requestAnimationFrame(animate);
 
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
+  circle.rotation.x += 0.01;
+  circle.rotation.y += 0.01;
 
   renderer.render(scene, camera);
 }
