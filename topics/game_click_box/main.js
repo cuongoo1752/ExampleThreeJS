@@ -19,6 +19,7 @@ var myScore = document.getElementById("score");
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2();
 
+// Tạo screne hiển thị
 function myScene() {
   scene = new THREE.Scene();
   var width = window.innerWidth;
@@ -31,29 +32,13 @@ function myScene() {
   document.getElementById("webgl-container").appendChild(renderer.domElement);
   clock = new THREE.Clock();
 
-  // add light
-  var sLight = new THREE.SpotLight(0xffffff);
-  sLight.position.set(-100, 100, 100);
-  scene.add(sLight);
+  // Thêm ánh sáng
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  directionalLight.position.set(500, 200, 200);
+  scene.add(directionalLight);
 
   var aLight = new THREE.AmbientLight(0xffffff);
   scene.add(aLight);
-}
-
-function spinner() {
-  var geometry = new THREE.BoxGeometry(1, 1, 1);
-  var material = new THREE.MeshPhongMaterial({
-    color: "hotpink",
-    ambient: "hotpink",
-  });
-
-  var cube = new THREE.Mesh(geometry, material);
-  cube.position.x = 10;
-  var spinner = new THREE.Object3D();
-  spinner.rotation.x = 6;
-
-  spinner.add(cube);
-  scene.add(spinner);
 }
 
 function addHolder() {
@@ -61,6 +46,7 @@ function addHolder() {
   holder.name = "holder";
 
   for (var i = 0; i < totalTargets; i++) {
+    // Thêm khối hộp và màu sắc ngẫu nhiên
     var ranCol = new THREE.Color();
     ranCol.setRGB(Math.random(), Math.random(), Math.random());
 
@@ -84,6 +70,7 @@ function addHolder() {
   scene.add(holder);
 }
 
+// Thêm vụ nổ ra làm 4 mảnh
 function addExplosion(point) {
   var timeNow = clock.getElapsedTime();
 
@@ -101,12 +88,14 @@ function addExplosion(point) {
   }
 }
 
+// Animate hoạt động liên tục
 function animate() {
   requestAnimationFrame(animate);
   render();
 }
 
 function render() {
+  // Xoay vòng và di chuyển phần tử
   holder.children.forEach(function (elem, index, array) {
     elem.rotation.y += speed * (6 - index);
     elem.children[0].rotation.x += 0.01;
@@ -142,6 +131,7 @@ function render() {
   renderer.render(scene, camera);
 }
 
+// Xử lý khi click chuột
 function onDocumentMouseDown(event) {
   event.preventDefault();
 
@@ -152,6 +142,7 @@ function onDocumentMouseDown(event) {
     return;
   }
 
+  // Tính toán vị trí chuột trên màn hình
   // calculate mouse position in normalized device coordinates
   // (-1 to +1) for both components
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -180,12 +171,12 @@ function onDocumentMouseDown(event) {
 
           if (level < totalLevels) {
             myScore.innerHTML =
-              "<strong>You got 'em all!</strong> Click the screen for level " +
+              "<strong>Bạn đã chiến thắng!</strong>Bấm vào màn hình để lên level." +
               (level + 1) +
               ".";
           } else {
             myScore.innerHTML =
-              "<strong>You win!</strong> Click the screen to play again.";
+              "<strong>Bạn đã chiến thắng!</strong> Bấm vào màn hình để bắt đầu lại.";
           }
         }
       }
@@ -193,14 +184,17 @@ function onDocumentMouseDown(event) {
   }
 }
 
+// Khởi động lại màn
 function restartScene() {
   myScore.innerHTML = "";
 
   if (level < totalLevels) {
+    // Tăng level cho người chơi
     speed += 0.005;
     totalTargets += 1;
     level += 1;
   } else {
+    // Trả về level 1
     speed = 0.01;
     totalTargets = 3;
     level = 1;
@@ -216,6 +210,7 @@ document
   .getElementById("webgl-container")
   .addEventListener("mousedown", onDocumentMouseDown, false);
 
+// Thay đổi camera khi thay đổi khung hình
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
