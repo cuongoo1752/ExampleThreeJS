@@ -1,3 +1,6 @@
+const DEFAULT_TOTAL_TARGET = 4;
+const DISTANCE_BETWEEN_2_BOXES = 3;
+const DEFAULT_SPEED = 0.008;
 var scene;
 var cube;
 var camera;
@@ -9,8 +12,8 @@ var particles = [];
 var level = 1;
 var totalLevels = 4;
 var score = 0;
-var totalTargets = 3;
-var speed = 0.01;
+var totalTargets = DEFAULT_TOTAL_TARGET;
+var speed = DEFAULT_SPEED;
 var complete = false;
 var comments = ["Dễ", "Bình thường", "Hơi khó", "Rất khó"];
 var myLevel = document.getElementById("level");
@@ -21,6 +24,7 @@ var mouse = new THREE.Vector2();
 
 // Tạo screne hiển thị
 function myScene() {
+  // Khởi tại Scene hiển thị
   scene = new THREE.Scene();
   var width = window.innerWidth;
   var height = window.innerHeight;
@@ -30,6 +34,7 @@ function myScene() {
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setSize(width, height);
   document.getElementById("webgl-container").appendChild(renderer.domElement);
+  // Khởi tạo clock
   clock = new THREE.Clock();
 
   // Thêm ánh sáng
@@ -50,14 +55,15 @@ function addHolder() {
     var ranCol = new THREE.Color();
     ranCol.setRGB(Math.random(), Math.random(), Math.random());
 
-    var geometry = new THREE.BoxGeometry(2, 2, 2);
+    var widthEdge = Math.floor(Math.random() * 2) + 1;
+    var geometry = new THREE.BoxGeometry(widthEdge, widthEdge, widthEdge);
     var material = new THREE.MeshPhongMaterial({
       color: ranCol,
       ambient: ranCol,
     });
 
     var cube = new THREE.Mesh(geometry, material);
-    cube.position.x = i * 5;
+    cube.position.x = i * DISTANCE_BETWEEN_2_BOXES;
     cube.name = "cubeName" + i;
 
     var spinner = new THREE.Object3D();
@@ -102,6 +108,7 @@ function render() {
     elem.children[0].rotation.y += 0.01;
   });
 
+  // Xử lý vụ nổ
   if (particles.length > 0) {
     particles.forEach(function (elem, index, array) {
       switch (elem.name) {
@@ -121,6 +128,7 @@ function render() {
           break;
       }
 
+      // Xóa phần tử khi quá thời gian
       if (elem.birthDay - clock.getElapsedTime() < -1) {
         scene.remove(elem);
         particles.splice(index, 1);
@@ -143,18 +151,18 @@ function onDocumentMouseDown(event) {
   }
 
   // Tính toán vị trí chuột trên màn hình
-  // calculate mouse position in normalized device coordinates
-  // (-1 to +1) for both components
+  // (-1 to +1) với 2 chiều
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-  // update the picking ray with the camera and mouse position
+  // cập nhật tia chọn với vị trí camera và chuột
   raycaster.setFromCamera(mouse, camera);
 
   if (score < totalTargets) {
-    holder.children.forEach(function (elem, index, array) {
+    holder.children.forEach(function (elem) {
       intersects = raycaster.intersectObjects(elem.children);
       if (intersects.length > 0 && intersects[0].object.visible) {
+        // Xử lý khi click trúng
         intersects[0].object.visible = false;
 
         addExplosion(intersects[0].point);
@@ -195,8 +203,8 @@ function restartScene() {
     level += 1;
   } else {
     // Trả về level 1
-    speed = 0.01;
-    totalTargets = 3;
+    speed = DEFAULT_SPEED;
+    totalTargets = DEFAULT_TOTAL_TARGET;
     level = 1;
   }
 
